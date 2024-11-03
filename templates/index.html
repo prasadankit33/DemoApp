@@ -1,0 +1,45 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Text Generator</title>
+    <style>
+        /* Simple styling */
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; padding: 2rem; }
+        #app { max-width: 500px; width: 100%; }
+        textarea, input { width: 100%; padding: 10px; margin: 10px 0; }
+        button { padding: 10px; }
+        #output { margin-top: 20px; padding: 10px; background-color: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Generate Text with AI</h1>
+        <textarea id="prompt" placeholder="Enter your prompt here..."></textarea>
+        <button onclick="generateText()">Generate</button>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        async function generateText() {
+            const prompt = document.getElementById("prompt").value;
+            const outputDiv = document.getElementById("output");
+            outputDiv.innerHTML = "Generating...";
+
+            // Send prompt to backend
+            const response = await fetch('/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ prompt: prompt })
+            });
+
+            const data = await response.json();
+            outputDiv.innerHTML = `<p>${data.generated_text}</p>`;
+        }
+    </script>
+</body>
+</html>
