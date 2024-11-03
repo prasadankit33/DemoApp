@@ -21,32 +21,24 @@ def get_weather():
         return jsonify({"error": "Please provide a location"}), 400
 
     try:
-        # Get the current date
-        current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        # Ask OpenAI for weather information in a specific location
-        prompt = f"Provide the current weather in {location} along with the date and time. Use plausible weather data."
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are an AI assistant that provides current weather details."},
-                {"role": "user", "content": prompt}
-            ]
+        # Use OpenAI's API to simulate weather information request
+        prompt = f"Provide the current weather in {location}."
+        response = openai.Completion.create(
+            engine="gpt-3.5-turbo",  # Ensure the correct model is used
+            prompt=prompt,
+            max_tokens=50
         )
-        
-        # Extract the generated response
         weather_info = response.choices[0].text.strip()
 
-        # Return the date and weather information
         return jsonify({
-            "date": current_date,
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "weather_info": weather_info
         })
 
     except Exception as e:
-        # Log and return any errors
-        print(f"Error in /weather endpoint: {str(e)}")
-        return jsonify({"error": "An internal server error occurred", "details": str(e)}), 500
+        # Provide detailed error messages from the OpenAI API or other failures
+        error_message = getattr(e, 'message', repr(e))
+        return jsonify({"error": "An internal server error occurred", "details": error_message}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
