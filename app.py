@@ -21,14 +21,15 @@ def get_weather():
         return jsonify({"error": "Please provide a location"}), 400
 
     try:
-        # Use OpenAI's API to simulate weather information request
-        prompt = f"Provide the current weather in {location}."
-        response = openai.Completion.create(
-            engine="gpt-3.5-turbo",  # Ensure the correct model is used
-            prompt=prompt,
-            max_tokens=50
+        # Correct endpoint use for chat model
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are an AI trained to provide weather information."},
+                {"role": "user", "content": f"Provide the current weather in {location}."}
+            ]
         )
-        weather_info = response.choices[0].text.strip()
+        weather_info = response['choices'][0]['message']['content']
 
         return jsonify({
             "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -36,7 +37,7 @@ def get_weather():
         })
 
     except Exception as e:
-        # Provide detailed error messages from the OpenAI API or other failures
+        # Log detailed error messages
         error_message = getattr(e, 'message', repr(e))
         return jsonify({"error": "An internal server error occurred", "details": error_message}), 500
 
