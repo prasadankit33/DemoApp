@@ -17,20 +17,20 @@ def generate_text():
     prompt = data.get("prompt")
 
     try:
-        # Call the OpenAI API
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=prompt,
-            max_tokens=150
+        # Update to use ChatCompletion
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # Specify the model, like "gpt-3.5-turbo"
+            messages=[
+                {"role": "system", "content": "You are an AI assistant."},
+                {"role": "user", "content": prompt}
+            ]
         )
-        generated_text = response.choices[0].text.strip()
+        generated_text = response['choices'][0]['message']['content'].strip()
         return jsonify({"generated_text": generated_text})
 
     except Exception as e:
-        # Log the exact error details for debugging
         print(f"Error in /generate endpoint: {str(e)}")
         return jsonify({"error": "An internal server error occurred", "details": str(e)}), 500
-
 
 if __name__ == '__main__':
     app.run(debug=True)
