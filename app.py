@@ -26,7 +26,7 @@ def get_weather():
 
         # Ask OpenAI for weather information in a specific location
         prompt = f"Provide the current weather in {location} along with the date and time. Use plausible weather data."
-        response = openai.Completion.create(
+        response = openai.ChatCompletion.create(
             model="text-davinci-003",
             prompt=prompt,
             max_tokens=100
