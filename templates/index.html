@@ -1,47 +1,54 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI-Powered Text Generator</title>
+    <title>Get Date and Weather Information</title>
     <style>
-        /* Simple styling */
+        /* Basic styling */
         body { font-family: Arial, sans-serif; display: flex; justify-content: center; padding: 2rem; }
         #app { max-width: 500px; width: 100%; }
-        textarea, input { width: 100%; padding: 10px; margin: 10px 0; }
-        button { padding: 10px; }
+        input, button { width: 100%; padding: 10px; margin: 10px 0; }
         #output { margin-top: 20px; padding: 10px; background-color: #f0f0f0; }
     </style>
 </head>
 <body>
     <div id="app">
-        <h1>Generate Text with AI</h1>
-        <textarea id="prompt" placeholder="Enter your prompt here..."></textarea>
-        <button onclick="generateText()">Generate</button>
+        <h1>Date and Weather Information</h1>
+        <input type="text" id="location" placeholder="Enter location (e.g., New Delhi)">
+        <button onclick="getWeather()">Get Weather Info</button>
         <div id="output"></div>
     </div>
 
     <script>
-        async function generateText() {
-
-            console.log("Generate button clicked"); 
-
-            const prompt = document.getElementById("prompt").value;
+        async function getWeather() {
+            const location = document.getElementById("location").value;
             const outputDiv = document.getElementById("output");
-            outputDiv.innerHTML = "Generating...";
+            outputDiv.innerHTML = "Fetching weather information...";
 
-            // Send prompt to backend
-            const response = await fetch('/generate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ prompt: prompt })
-            });
+            try {
+                const response = await fetch('/weather', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ location: location })
+                });
 
-            const data = await response.json();
-            outputDiv.innerHTML = `<p>${data.generated_text}</p>`;
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'An error occurred while fetching the weather information.');
+                }
+
+                const data = await response.json();
+                outputDiv.innerHTML = `
+                    <p><strong>Date:</strong> ${data.date}</p>
+                    <p><strong>Weather Info:</strong> ${data.weather_info}</p>
+                `;
+            } catch (error) {
+                console.error("Error:", error);
+                outputDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
         }
     </script>
 </body>
